@@ -1,22 +1,27 @@
-
+import unittest
 import greatcircle
-
-martinitoren = (53.219332, 6.568239) # the Martinitoren in Groningen
-csamsterdam = (52.378230, 4.899997) # Amsterdam Central Station
-km = greatcircle.distance(martinitoren[0], martinitoren[1], csamsterdam[0], csamsterdam[1])
-assert int(km) == 146
-
-
-
 import calculator
+   
+class DutchpostcodesTest(unittest.TestCase):
 
-calc = calculator.Calculator()
-assert calc.distance(9718, 99999) is None
-assert calc.distance(99999, 1000) is None
-assert int(calc.distance(9718, 1000)) == 146
+    def test_greatcircle(self):
+        martinitoren = (53.219332, 6.568239) # the Martinitoren in Groningen
+        csamsterdam = (52.378230, 4.899997) # Amsterdam Central Station
+        km = greatcircle.distance(martinitoren[0], martinitoren[1], csamsterdam[0], csamsterdam[1])
+        self.assertEqual(int(km), 146, "Distance between Martinitoren and CS Amsterdam should be 146 km")
 
-within = [postcode for (postcode, km) in calc.postcodesaround(9718, 10)]
+    def test_between(self):
+        calc = calculator.Calculator()
+        self.assertEqual(calc.distance(9718, 99999), None, "Distance between an existing and non-existing postcode should be None")
+        self.assertEqual(calc.distance(99999, 1000), None, "Distance between an existing and non-existing postcode should be None")
+        self.assertEqual(int(calc.distance(9718, 1000)), 146, "Distance between postcodes 9718 and 1000 should be 146 km")
 
-assert len(within) > 0
-assert 9811 in within
-assert 1200 not in within
+    def test_within(self):
+        calc = calculator.Calculator()
+        within = [postcode for (postcode, km) in calc.postcodesaround(9718, 10)]
+        self.assertEqual(len(within) > 0, True, "There should be al least one postcode within 10km of postcode 9718")
+        self.assertEqual(9811 in within, True, "Postcode 9811 should be within 10km of postcode 9718")
+        self.assertEqual(1200 in within, False, "Postcode 9811 shouldn't be within 10km of postcode 9718")
+        
+if __name__ == "__main__":
+    unittest.main()
